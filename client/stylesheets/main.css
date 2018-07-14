@@ -1,0 +1,59 @@
+.progress.page-load {
+    margin: 0;
+}
+
+a.brand-logo{
+    margin-left: 2em;
+}
+
+div#user-sign-in-modal.modal.open {
+    width: 30%;
+}
+
+div#user-sign-in-modal.modal{
+    width: 30%;
+}
+
+div#user-sign-up-modal.modal.open {
+    width: 40%;
+}
+
+div#user-sign-up-modal.modal{
+    width: 40%;
+}
+
+.modal-footer {
+    display: none;
+}
+
+.sign-button {
+    margin: 2em;
+}
+
+.form-button{
+    margin: 1.3em;
+}
+
+.select-dropdown{
+    max-height: 150px;
+    overflow-y: auto !important;
+}
+
+@media only screen and (max-width: 916px){
+    div#user-sign-in-modal.modal.open {
+        width: 70%;
+    }
+    
+    div#user-sign-in-modal.modal{
+        width: 70%;
+    }
+    
+    div#user-sign-up-modal.modal.open {
+        width: 90%;
+    }
+    
+    div#user-sign-up-modal.modal{
+        width: 90%;
+    }
+    
+}

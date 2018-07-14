@@ -1,0 +1,16 @@
+.name-td{
+    width: 300px;
+}
+
+.score-td{
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+input.table-input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: rgb(0, 0, 0);
+}
+
+input.table-input{
+    margin: 0 !important;
+}

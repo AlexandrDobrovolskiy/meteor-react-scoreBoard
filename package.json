@@ -1,0 +1,19 @@
+{
+  "name": "bare-scoreboard",
+  "private": true,
+  "scripts": {
+    "start": "meteor run"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.0.0-beta.51",
+    "bcrypt": "^2.0.0",
+    "materialize-css": "^1.0.0-rc.2",
+    "meteor-node-stubs": "^0.4.1",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-materialize": "^2.3.3",
+    "react-mounter": "^1.2.0",
+    "react-placeholder": "^3.0.1",
+    "react-table": "^6.8.6"
+  }
+}
