@@ -7,7 +7,8 @@ import {
     CollapsibleItem, 
     Row, 
     Col,
-    Preloader 
+    Preloader,
+    Badge 
 } from 'react-materialize';
 import TrackerReact from 'meteor/ultimatejs:tracker-react';
 
@@ -47,29 +48,36 @@ export default class GroupsWrapper extends TrackerReact(Component) {
   render() {
     return (
       <div className="container">
-        <h4>Groups <span className="right align">{this.groups().length}</span></h4>
-        <form onSubmit={this.addGroup.bind(this)}>
-            <Row s={12}>
-                <Col s={10}>
-                    <input 
-                        type="text"
-                        ref="newGroup"
-                        placeholder="New Group"
-                    />
-                </Col>
-                <Col>
-                    <Button 
-                        waves='light'
-                        className="right"   
-                        type='submit'
-                    >
-                        Add Group
-                    </Button>
-                </Col>
-            </Row>
-        </form>
             <Preloader size='big' flashing active={!this.groups()}/>
             <Collapsible popout accordion >
+            <CollapsibleItem
+                header={
+                    <span>
+                        Add new Group
+                    </span>} 
+                icon='add'
+            >
+            <form onSubmit={this.addGroup.bind(this)}>
+                <Row s={12}>
+                    <Col s={10}>
+                        <input 
+                            type="text"
+                            ref="newGroup"
+                            placeholder="New Group"
+                        />
+                    </Col>
+                    <Col>
+                        <Button 
+                            waves='light'
+                            className="right"   
+                            type='submit'
+                        >
+                            Add Group
+                        </Button>
+                    </Col>
+                </Row>
+            </form>
+            </CollapsibleItem>
             {!!this.groups() && this.groups().map((group, index) => {
                 return (
                     <CollapsibleItem 
@@ -86,17 +94,7 @@ export default class GroupsWrapper extends TrackerReact(Component) {
                     >
                     <Row s={12}>
                         <Col s={4}>
-                        Disciplines
-                        {
-                            group.disciplines.length > 0 ?
-                            <Collection>
-                                {group.disciplines.map((discipline, index) => 
-                                    <CollectionItem key={index}>{!!this.subject(discipline._id) && this.subject(discipline._id).name}</CollectionItem>
-                                )}
-                            </Collection>
-                            : 
-                            <p>There are no disciplines yet.</p>
-                        }
+                        <a href={`group/${group._id}`}>View group Profile</a>
                         </Col>
                     </Row>
                     </CollapsibleItem>

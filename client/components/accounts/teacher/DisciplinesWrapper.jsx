@@ -45,7 +45,7 @@ export default class DisciplinesWrapper extends TrackerReact(Component) {
             groups: relatedGroups
         }
 
-        Meteor.call('addDiscipline', newSubject, (err, res) => {
+        Meteor.call('addSubject', newSubject, (err, res) => {
             console.log(err);
         });
 

@@ -10,6 +10,7 @@ import TeacherProfile from './components/accounts/profiles/TecherProfile';
 import GroupsWrapper from './components/GroupsWrapper';
 import DisciplinesWrapper from './components/accounts/teacher/DisciplinesWrapper';
 import ScoreBoard from './components/ScoreBoard';
+import GroupProfile from './components/accounts/profiles/GroupProfile';
 
 const studentRoutes = FlowRouter.group({
     prefix: routes.STUDENT,
@@ -71,11 +72,20 @@ teacherRoutes.route('/subjects', {
     }
 });
 
-FlowRouter.route('/:disciplineId/:groupId', {
+teacherRoutes.route('/:disciplineId/:groupId', {
     action(params, query) {
         mount(MainLayout, {
-            content: (<ScoreBoard discipline={params.disciplineId} group={params.groupId} />),
-            footer: (<p>Footer here</p>)
+            content: (<ScoreBoard discipline={params.disciplineId} group={params.groupId}/>),
+            footer: (<p className='grey'>Fooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooter</p>)
+        })
+    }
+});
+
+FlowRouter.route('/group/:id', {
+    action(params, query){
+        mount(MainLayout, {
+            content: (<GroupProfile id={params.id}/>),
+            footer: (<FooterNav />)
         })
     }
 });
