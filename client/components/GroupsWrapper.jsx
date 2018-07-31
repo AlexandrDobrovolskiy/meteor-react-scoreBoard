@@ -94,7 +94,7 @@ export default class GroupsWrapper extends TrackerReact(Component) {
                     >
                     <Row s={12}>
                         <Col s={4}>
-                        <a href={`group/${group._id}`}>View group Profile</a>
+                        <Button onClick={() => {FlowRouter.go(`/group/${group._id}`)}}>View group Profile</Button>
                         </Col>
                     </Row>
                     </CollapsibleItem>

@@ -21,8 +21,10 @@ Meteor.methods({
             Meteor.call('addStudent', {
                 userId,
                 groupId,
-                avgScore: 0
+                avgScore: 0,
+                rating: 0
             });
+            
             Groups.update(groupId, {
                 $push: { students: {
                     userId,

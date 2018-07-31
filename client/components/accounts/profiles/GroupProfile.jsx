@@ -8,7 +8,7 @@ export default class GroupProfile extends TrackerReact(Component) {
         this.state = {
             subscriptions: {
                 group: Meteor.subscribe('group', id),
-                boards: Meteor.subscribe('boards', id)
+                boards: Meteor.subscribe('boards', id),
             }
         }
     }

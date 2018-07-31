@@ -7,33 +7,13 @@ import {
     MenuItem,
     Table,
     Input,
-    Button
+    Button,
+    Tabs,
+    Tab
 } from 'react-materialize'
+import BoardWrapper from './BoardWrapper';
 
 Boards = new Mongo.Collection('boards');
-
-const updateByPropertyName = (propertyName, value) => () => ({
-    [propertyName]: value,
-});
-
-const EditableCell = ({value}) => {
-    return (
-        <Input 
-            type='text' 
-            defaultValue={value}
-            autoComplete={'off'}
-            className={'table-input'}
-        />
-    )
-}
-
-const DateCell = ({value}) => 
-    <Input 
-        type='date'
-        placeholder={value}
-        className={'table-input'}
-        onChange={function(e, value) {}} 
-    />
 
 export default class ScoreBoard extends TrackerReact(Component) {
     constructor(props){
@@ -50,16 +30,29 @@ export default class ScoreBoard extends TrackerReact(Component) {
                 discipline: Meteor.subscribe('subject', discipline),
                 boards: Meteor.subscribe('boards', group, discipline)
             },
-            scores: []
+            newBoardName: ''
         }
+
+        this.handleCreate = this.handleCreate.bind(this);
     }
 
-    componentWillMount = () => {
-      this.setState({
-          scores: this.scores()
-      });
+
+    handleCreate(e){
+        const groupId = this.group()._id;
+        const subjectId = this.subject()._id;
+        const name = this.refs.newBoardName.input.value.trim();
+
+        Meteor.call('createBoard', {
+            groupId,
+            subjectId,
+            name
+        }, (err, res) => {
+            console.log(err);
+            console.log(res);
+        });
+
+        e.preventDefault();
     }
-    
 
     group = () => Groups.findOne(this.props.group);
 
@@ -75,21 +68,40 @@ export default class ScoreBoard extends TrackerReact(Component) {
         subscriptions.boards.stop();
     }
 
+    ready = () => !!this.group() && !!this.boards() && !!this.subject()
+
     render() {
-        if(!this.group()) return 'loading'
+
+        if(!this.group() && !this.boards() && !this.subject()) return 'loading'
+
         return (
-            <div>
-                <Table hoverable>
-                    <thead>
-                        {this.boards()[0].header.map(item => <th>{item}</th>)}
-                    </thead>
-                    <tbody>
-                        {this.boards()[0].rows.map(row => {
-                            return <tr>{row.map(item => <td>{item}</td>)}</tr>
-                        })}
-                    </tbody>
-                </Table>
-            </div>
+            <Tabs className='sb-tabs' key={'tabs' + new Date().toDateString()}>
+                {
+                    this.boards().map(b => 
+                        <Tab className='sb-tab' title={b.name} key={b._id + new Date()}>
+                            <BoardWrapper board={b} key={b._id} />
+                        </Tab>
+                    )
+                }
+                <Tab 
+                    className='sb-create-tab'
+                    id='create'
+                    title={
+                        <Input 
+                            type='text' 
+                            label='Create board'
+                            ref="newBoardName" 
+                        />
+                    }
+                >
+                    <div
+                        className='sb-create-content'
+                    >
+                        Create new board =)
+                        <Button onClick={this.handleCreate}> Create </Button>
+                    </div>
+                </Tab>
+            </Tabs>
         )
     }
 }

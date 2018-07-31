@@ -50,7 +50,8 @@ export default class UserSignUp extends TrackerReact(Component) {
                     groups: [group]
                 }
             }, 
-            role = this.state.role; 
+            role = this.state.role, 
+            groupId = !!group ? group._id : null;
         
         Accounts.createUser(user, (error) => { 
             if(error){
@@ -59,7 +60,7 @@ export default class UserSignUp extends TrackerReact(Component) {
                 Meteor.call('onUserRegistered', {
                     name: user.username,
                     userId: Meteor.userId(),
-                    groupId: group._id,
+                    groupId,
                     roles: [role]
                 }, (err, res) => {
                     if(!err){

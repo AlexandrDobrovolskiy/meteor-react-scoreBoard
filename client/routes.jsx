@@ -11,6 +11,7 @@ import GroupsWrapper from './components/GroupsWrapper';
 import DisciplinesWrapper from './components/accounts/teacher/DisciplinesWrapper';
 import ScoreBoard from './components/ScoreBoard';
 import GroupProfile from './components/accounts/profiles/GroupProfile';
+import BareFooter from './components/BareFooter';
 
 const studentRoutes = FlowRouter.group({
     prefix: routes.STUDENT,
@@ -76,7 +77,7 @@ teacherRoutes.route('/:disciplineId/:groupId', {
     action(params, query) {
         mount(MainLayout, {
             content: (<ScoreBoard discipline={params.disciplineId} group={params.groupId}/>),
-            footer: (<p className='grey'>Fooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooter</p>)
+            footer: (<BareFooter />)
         })
     }
 });
