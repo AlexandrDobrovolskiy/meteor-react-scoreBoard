@@ -1,0 +1,41 @@
+.react-tabs__tab-list{
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+}
+.sb-tab{
+    padding: 10px 35px 15px 35px;
+    cursor: pointer;
+}
+
+.sb-create-tab .col.input-field{
+    margin: 0 !important;
+}
+
+.sb-create-tab input{
+    margin: 0 !important;
+    text-align: center;
+}
+
+.sb-create-tab input{
+    border: none !important;
+}
+
+.td-cell{
+    margin: 0 !important;
+    width: 75px !important;
+    text-align: center;
+    margin: 10px !important;
+}
+
+td{
+    padding: 0 !important;
+}
+
+.name-td{
+    width: 250px !important;
+}
+
+.th-cell::placeholder{
+    color: black;
+}

@@ -14,3 +14,17 @@ input.table-input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
 input.table-input{
     margin: 0 !important;
 }
+
+div.col{
+    padding: 0 !important;
+}
+
+input.th-cell{
+    margin: 0 !important;
+    border: none !important;
+}
+
+.react-contextmenu.react-contextmenu--visible{
+    width: auto !important;
+    height: auto;
+}

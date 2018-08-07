@@ -1,8 +1,8 @@
 Students = new Mongo.Collection('students');
 
-const fiveDays = 5 * 24 * 60 * 60 * 1000;
+const fiveDays = 15 * 1000;
 
-setInterval(() => {
+Meteor.setInterval(() => {
     const students = Students.find().fetch();
     const mapProgress = students.map(student => {
         student.progress.push({score: student.avgScore, date: new Date()});
@@ -17,13 +17,17 @@ setInterval(() => {
     });
 
     _.forEach(mapProgress, progress => {
-        Students.update(progress.id, {progress: { $set: progress.progress}});
+        Students.update(progress.id, {$set: {progress: progress.progress}});
     });
 }, fiveDays);
 
+Meteor.publish('student', function(userId){
+    return Students.find({userId});
+});
+
 Meteor.methods({
     'addStudent'({userId, groupId, avgScore, rating}){
-        return Students.insert({userId, groupId, avgScore});
+        return Students.insert({userId, groupId, avgScore, rating, progress: []});
     },
     'updateRating'(studentId){
 
@@ -33,6 +37,6 @@ Meteor.methods({
                     return lodash.find(board.rows, row => row.userId === student.userId).avg;
                 })
         
-        Students.update(studentId, { avgScore: lodash.mean(allAvg), rating: lodash.sum(allAvg)});
+        Students.update(studentId,{ $set: { avgScore: lodash.mean(allAvg), rating: lodash.sum(allAvg)}});
     }
 });

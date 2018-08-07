@@ -8,10 +8,10 @@ import {
     Table,
     Input,
     Button,
-    Tabs,
-    Tab
 } from 'react-materialize'
-import BoardWrapper from './BoardWrapper';
+import BoardWrapper from './BoardWrapper'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
+import './style.css'
 
 Boards = new Mongo.Collection('boards');
 
@@ -28,7 +28,7 @@ export default class ScoreBoard extends TrackerReact(Component) {
             subscriptions: {
                 group: Meteor.subscribe('group', group),
                 discipline: Meteor.subscribe('subject', discipline),
-                boards: Meteor.subscribe('boards', group, discipline)
+                boards: Meteor.subscribe('groupBoards', group, discipline)
             },
             newBoardName: ''
         }
@@ -75,32 +75,41 @@ export default class ScoreBoard extends TrackerReact(Component) {
         if(!this.group() && !this.boards() && !this.subject()) return 'loading'
 
         return (
-            <Tabs className='sb-tabs' key={'tabs' + new Date().toDateString()}>
-                {
+            <Tabs>
+                <TabList>
+                  {
                     this.boards().map(b => 
-                        <Tab className='sb-tab' title={b.name} key={b._id + new Date()}>
-                            <BoardWrapper board={b} key={b._id} />
+                        <Tab className='sb-tab'key={b._id + new Date()}>
+                        {b.name}
                         </Tab>
                     )
-                }
-                <Tab 
+                  }
+                  <Tab 
                     className='sb-create-tab'
                     id='create'
-                    title={
-                        <Input 
-                            type='text' 
-                            label='Create board'
-                            ref="newBoardName" 
-                        />
-                    }
+                  >
+                    <Input 
+                        type='text' 
+                        defaultValue='New board'
+                        ref="newBoardName" 
+                    />
+                  </Tab>
+                </TabList>
+                {
+                this.boards().map(b => 
+                    <TabPanel key={b._id}>
+                      <BoardWrapper board={b}/>
+                    </TabPanel>
+                )
+                }
+                <TabPanel>
+                <div
+                    className='sb-create-content container center-align'
                 >
-                    <div
-                        className='sb-create-content'
-                    >
-                        Create new board =)
-                        <Button onClick={this.handleCreate}> Create </Button>
-                    </div>
-                </Tab>
+                    <p>All things are clear.</p>
+                    <Button onClick={this.handleCreate}>CREATE NEW BOARD</Button>
+                </div>
+                </TabPanel>
             </Tabs>
         )
     }

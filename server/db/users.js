@@ -1,3 +1,7 @@
+Meteor.publish('user', function(userId){
+    return Meteor.users.find(userId, {fields: {profile: 1}});
+});
+
 Meteor.methods({
     'addRoles'({ userId, roles }) {
       Roles.addUsersToRoles(userId, roles);
@@ -32,6 +36,8 @@ Meteor.methods({
                 }},
                 $set: {disciplines: group.disciplines}
             },);
+
+            Meteor.call('addStudentToBoards', userId);
         }
     },
 });

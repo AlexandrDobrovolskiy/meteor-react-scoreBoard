@@ -57,3 +57,7 @@ div#user-sign-up-modal.modal{
     }
     
 }
+
+.link{
+    cursor: pointer;
+}
