@@ -18,6 +18,14 @@ Meteor.publish('groupBoards', function(groupId) {
     }
 });
 
+Meteor.publish('board', function(id){
+    if(Roles.userIsInRole(Meteor.user(), ['teacher'])){
+        return Boards.find(id);
+    }else{
+        throw new Meteor.Error(403, 'Request without permissions.');
+    }
+});
+
 Meteor.methods({
     'createBoard'({groupId, subjectId, name}){
 
@@ -69,7 +77,7 @@ Meteor.methods({
             Meteor.call('updateRating', Students.findOne({userId}));
         });
     },
-    'updateBoardCell'({id, rIndex, cIndex, cell}){
+    'updateBoardRow'({id, call, rIndex, cIndex, value}){
         if(!Roles.userIsInRole(Meteor.userId(), 'teacher')){
             throw new Meteor.Error(403, 'Request without permissions');
         }
@@ -80,7 +88,16 @@ Meteor.methods({
             throw new Meteor.Error('Invalid row index');
         }
 
-        row.scores[cIndex] = cell;
+        switch (call){
+            case 'score':
+                row.scores[cIndex].value = value;
+                break;
+            case 'mark':
+                row.scores[cIndex].marked = value;
+                break;
+            default:
+                break;
+        }
 
         row.avg = lodash.mean(lodash.compact(row.scores.map(score => {
             const num = parseInt(score.value);
@@ -100,10 +117,66 @@ Meteor.methods({
         Meteor.call('updateRating', Students.findOne({userId}));
 
     },
-    'updateBoardHeader'({id, rIndex, cIndex, header}){
+    'updateBoardNewColumn'({id}){
         if(!Roles.userIsInRole(Meteor.userId(), 'teacher')){
             throw new Meteor.Error(403, 'Request without permissions');
         }
+
+        const board = Boards.findOne(id);
+
+        board.header.push({
+            date: new Date(), 
+            caption: 'Lesson ' + board.header.length
+        });
+
+        board.rows.forEach(row => {
+            row.scores.push({
+                value: 0,
+                marked: false,
+            })
+        });
+
+        Boards.update(id, board);
+    },
+    'updateBoardHeader'({id, index, call, value}){
+        if(!Roles.userIsInRole(Meteor.userId(), 'teacher')){
+            throw new Meteor.Error(403, 'Request without permissions');
+        }
+
+        const cell = Boards.findOne(id).header[index];
+
+        if(!cell){
+            throw new Meteor.Error('Invalid header index');
+        }
+
+        switch (call){
+            case 'caption':
+                cell.caption = value;
+                break;
+            case 'date':
+                cell.date = value;
+                break;
+            default:
+                break;
+        }
+
+        let modifier = { $set: {}};
+        modifier.$set[`header.${index}`] = cell; 
+
+        Boards.update(id, modifier);
+    },
+    'updateBoardMarkColumn'({id, index, color}){
+        if(!Roles.userIsInRole(Meteor.userId(), 'teacher')){
+            throw new Meteor.Error(403, 'Request without permissions');
+        }
+
+        const board = Boards.findOne(id);
+
+        board.rows.forEach(row => {
+            row.scores[index].marked = color;
+        });
+
+        Boards.update(id, board);
     },
     'addStudentToBoards'(userId){
         const user = Meteor.users.findOne(userId),

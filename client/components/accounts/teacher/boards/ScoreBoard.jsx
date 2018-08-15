@@ -75,17 +75,17 @@ export default class ScoreBoard extends TrackerReact(Component) {
         if(!this.group() && !this.boards() && !this.subject()) return 'loading'
 
         return (
-            <Tabs>
-                <TabList>
+            <Tabs className='sb-tabs'>
+                <TabList className='sb-tablist'>
                   {
                     this.boards().map(b => 
-                        <Tab className='sb-tab'key={b._id + new Date()}>
+                        <Tab className='sb-tab'key={b._id + new Date()} className='sb-tab flow-text red-text text-lighten-1'>
                         {b.name}
                         </Tab>
                     )
                   }
                   <Tab 
-                    className='sb-create-tab'
+                    className='sb-create-tab sb-tab flow-text red-text text-lighten-1'
                     id='create'
                   >
                     <Input 
@@ -98,7 +98,7 @@ export default class ScoreBoard extends TrackerReact(Component) {
                 {
                 this.boards().map(b => 
                     <TabPanel key={b._id}>
-                      <BoardWrapper board={b}/>
+                      <BoardWrapper board={b._id}/>
                     </TabPanel>
                 )
                 }

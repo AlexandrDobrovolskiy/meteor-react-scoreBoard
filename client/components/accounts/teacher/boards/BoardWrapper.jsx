@@ -22,151 +22,92 @@ export default class BoardWrapper extends TrackerReact(Component) {
         super(props);
 
         this.state = {
-            table: this.props.board,
+            subscriptions: {
+                board: Meteor.subscribe('board', this.props.board)
+            },
             editedHeaders: [],
             editedCells: []
         }
 
-        this.state.table.rows.sort((f, s) => {
-            let fname = f.name.toUpperCase();
-            let sname = s.name.toUpperCase();
-            if(fname < sname){
-                return -1;
-            }
-            if(fname > sname){
-                return 1;
-            }
-            return 0;
-        });
-
-
         this.handleNewColumn = this.handleNewColumn.bind(this);
-        this.handleRowsChange = this.handleRowsChange.bind(this);
         this.handleHeaderChange = this.handleHeaderChange.bind(this);
-        this.handleSave = this.handleSave.bind(this);
+        this.handleUpdateHeaderCaption = this.handleUpdateHeaderCaption.bind(this);
+        this.handleUpdateScore = this.handleUpdateScore.bind(this);
+        this.autoSaveHeader = this.autoSaveHeader.bind(this);
+        this.autoSaveRow = this.autoSaveRow.bind(this);
+
     }
 
     handleNewColumn(event){
-        const { table } = this.state;
-
-        if(table.header.length < constants.MAX_COLUMNS){
-            this.setState(prev => {
-                prev.table.header.push({
-                    date: new Date(),
-                    caption: `lesson ${prev.table.header.length + 1}`
-                });
-
-                _.forEach(prev.table.rows, row => {
-                    row.scores.push({
-                        value: 0,
-                        marked: false
-                    })
-                });
-    
-                return prev;
-            }, this.handleSave);    
-        }else{
-            //TODO: nice toast with caption "No more columns allowed, you may create new board"
-        }
+        const { board } = this.props;
+        Meteor.call('updateBoardNewColumn', {id: board});
         
         event.preventDefault();
     }
 
-    handleHeaderChange(index){
-
-        return (event, value) => {
-            this.setState(prev => {
-                prev.table.header[index].date = value;
-
-                return prev;
-            }, this.handleSave);
+    handleHeaderChange = (index) => (event, value) => {
+            this.autoSaveHeader(index, value, 'date');
 
             event.preventDefault();
         }
+
+    handleUpdateScore = (rIndex, cIndex) => (event, value) => {
+        this.autoSaveRow(rIndex, cIndex, value, 'score');
+
+        event.preventDefault();
     }
 
-    handleRowsChange(rIndex, cIndex){
-
-        return (event) => {
-            this.setState(prev => {
-                prev.table.rows[rIndex].scores[cIndex].value = this.refs[`cell${rIndex}_${cIndex}`].input.value;
-                prev.editedCells.push(`${rIndex}_${cIndex}`);
-
-                return prev;
-            }, this.autoSaveCell(rIndex, cIndex));
-
-            event.preventDefault();
-        }
-    }
-
-    handleSave(){
-        const { table } = this.state;
-
-        Meteor.call('updateBoard', {
-            id: table._id,
-            table
-        });
-    }
-
-    autoSaveCell = (rIndex, cIndex) => () => {
-        const { table } = this.state;
-
-        Meteor.call('updateBoardCell', {
-            id: table._id,
+    autoSaveRow = (rIndex, cIndex, value, call) => {
+        Meteor.call('updateBoardRow', {
+            id: this.props.board,
+            call,
             rIndex,
             cIndex,
-            cell: table.rows[rIndex].scores[cIndex]
+            value
+        })
+    }
+    
+    autoSaveHeader = (index, value, call) => {
+        Meteor.call('updateBoardHeader', {
+            id: this.props.board,
+            call,
+            index,
+            value
         })
     }
 
-    handleHeaderCaptionChange(index){
-
-        return (event) => {
-            this.setState(prev => {
-                prev.table.header[index].caption = this.refs[`caption${index}`].input.value;
-
-                return prev;
-            }, this.handleSave);
+    handleUpdateHeaderCaption = (index) => (event, value) => {
+            this.autoSaveHeader(index, value, 'caption')
 
             event.preventDefault();
         }
+    
+
+
+    markColumn = (index) => (color, event) => {
+        Meteor.call('updateBoardMarkColumn', {
+            id: this.props.board,
+            index,
+            color: color.hex
+        });
+
+        event.preventDefault();
     }
+    
 
+    markCell = (rIndex, cIndex) => (color, event) => {
+        this.autoSaveRow(rIndex, cIndex, color.hex, 'mark');
 
-    markColumn(index){
-
-        return (color, event) => {
-            this.setState(prev => {
-                _.forEach(prev.table.rows, row => {
-                    row.scores[index].marked = color.hex;
-                })
-
-                return prev;
-            }, this.handleSave);
-
-            event.preventDefault();
-        }
+        event.preventDefault();
     }
+    
+    board = () => Boards.findOne(this.props.board);
 
-    markCell(rIndex, cIndex){
-        return (color, event) => {
-            this.setState(prev => {
-                prev.table.rows[rIndex].scores[cIndex].marked = color.hex;
-                prev.editedCells.push(`${rIndex}_${cIndex}`);
-
-                return prev;
-            }, this.autoSaveCell(rIndex, cIndex));
-
-            event.preventDefault();
-        }
+    componentWillUnmount = () => {
+      this.state.subscriptions.board.stop();
     }
 
     render() {
-      const {
-        header,
-        rows,
-      } = this.state.table;
-      
       return (
         <div>
         <Table hoverable bordered>
@@ -175,7 +116,7 @@ export default class BoardWrapper extends TrackerReact(Component) {
                     <th className='name-td'>
                       Name
                     </th>
-                    {header.map((item , index) => 
+                    {this.board().header.map((item , index) => 
                     <th key={index}>
                         <ContextMenuTrigger id={'th' + index}>
                         <ThCell 
@@ -184,12 +125,11 @@ export default class BoardWrapper extends TrackerReact(Component) {
                             onChange={this.handleHeaderChange(index)} 
                         />
                         </ContextMenuTrigger>
-                        <ContextMenu id={'th' + index} className='white black-text' style={{zIndex: 10, padding: '10px'}}>
+                        <ContextMenu id={'th' + index} className='white black-text td-context'>
                           <Input 
                             type='text' 
                             placeholder={item.caption}
-                            ref={`caption${index}`}
-                            onBlur={this.handleHeaderCaptionChange(index)}
+                            onChange={this.handleUpdateHeaderCaption(index)}
                             autoComplete='off'
                           />
                           <MenuItem divider className='grey'/>
@@ -208,7 +148,7 @@ export default class BoardWrapper extends TrackerReact(Component) {
             </thead>
             <tbody>
                 {
-                rows.map((row, rIndex) => 
+                this.board().rows.map((row, rIndex) => 
                     <tr key={rIndex}>
                         <td className='name-td'><Link to={'/student/' + row.userId}><Badge>{rIndex + 1}</Badge>{row.name}</Link></td>
                         {row.scores.map((item, cIndex) => 
@@ -220,11 +160,10 @@ export default class BoardWrapper extends TrackerReact(Component) {
                                     edited={this.state.editedCells.includes(`${rIndex}_${cIndex}`)} 
                                 />
                                 </ContextMenuTrigger>
-                                <ContextMenu id={`th${rIndex}_${cIndex}`} className='white black-text' style={{zIndex: 10, padding: '10px'}}>
+                                <ContextMenu id={`th${rIndex}_${cIndex}`} className='white black-text td-context'>
                                   <Input
                                     type='text'
-                                    ref={`cell${rIndex}_${cIndex}`}
-                                    onBlur={this.handleRowsChange(rIndex, cIndex)}
+                                    onChange={this.handleUpdateScore(rIndex, cIndex)}
                                     placeholder={item.value.toString()}
                                   />
                                   <MenuItem divider className='grey'/>
