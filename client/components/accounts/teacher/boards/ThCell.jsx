@@ -1,10 +1,15 @@
 import React from 'react'
 import { Input } from 'react-materialize'
 
-const ThCell = ({onChange, value, caption}) => {
+const ThCell = ({onChange, value, caption, onChangeCaption}) => {
     return (
             <div className='th-cell-container'>
-                {caption}
+                <Input
+                    type='text'
+                    className='th-cell'
+                    onChange={onChangeCaption}
+                    placeholder={caption}
+                />
                 <Input
                     type='date'
                     className='th-cell'

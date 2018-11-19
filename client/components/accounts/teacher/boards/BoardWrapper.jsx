@@ -108,6 +108,9 @@ export default class BoardWrapper extends TrackerReact(Component) {
     }
 
     render() {
+
+        if(!this.board()) return 'l'
+
       return (
         <div>
         <Table hoverable bordered>
@@ -118,23 +121,12 @@ export default class BoardWrapper extends TrackerReact(Component) {
                     </th>
                     {this.board().header.map((item , index) => 
                     <th key={index}>
-                        <ContextMenuTrigger id={'th' + index}>
                         <ThCell 
                             caption={item.caption}
                             value={new Date(item.date).toLocaleDateString()} 
                             onChange={this.handleHeaderChange(index)} 
+                            onChangeCaption={this.handleUpdateHeaderCaption(index)}
                         />
-                        </ContextMenuTrigger>
-                        <ContextMenu id={'th' + index} className='white black-text td-context'>
-                          <Input 
-                            type='text' 
-                            placeholder={item.caption}
-                            onChange={this.handleUpdateHeaderCaption(index)}
-                            autoComplete='off'
-                          />
-                          <MenuItem divider className='grey'/>
-                          <CirclePicker onChange={this.markColumn(index)}/>
-                        </ContextMenu>
                     </th>)
                     }
                     <th>
@@ -153,25 +145,11 @@ export default class BoardWrapper extends TrackerReact(Component) {
                         <td className='name-td'><Link to={'/student/' + row.userId}><Badge>{rIndex + 1}</Badge>{row.name}</Link></td>
                         {row.scores.map((item, cIndex) => 
                             <td key={`${rIndex}_${cIndex}`}> 
-                                <ContextMenuTrigger id={`th${rIndex}_${cIndex}`}>
                                 <TdCell  
-                                    marked={item.marked} 
                                     value={item.value.toString()}
                                     edited={this.state.editedCells.includes(`${rIndex}_${cIndex}`)} 
-                                />
-                                </ContextMenuTrigger>
-                                <ContextMenu id={`th${rIndex}_${cIndex}`} className='white black-text td-context'>
-                                  <Input
-                                    type='text'
                                     onChange={this.handleUpdateScore(rIndex, cIndex)}
-                                    placeholder={item.value.toString()}
-                                  />
-                                  <MenuItem divider className='grey'/>
-                                  <CirclePicker onChange={this.markCell(rIndex, cIndex)}/>
-                                  <MenuItem onClick={e => {this.markCell(rIndex, cIndex)(false)}}>
-                                  Unmark
-                                  </MenuItem>
-                                </ContextMenu>
+                                />
                             </td>)
                         }
                         <td> </td>

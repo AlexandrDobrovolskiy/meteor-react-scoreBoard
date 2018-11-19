@@ -24,7 +24,7 @@ const adminRoutes = FlowRouter.group({
     prefix: routes.ADMIN,
     name: 'admin',
     triggersEnter: [(context, redirect) => {
-        console.log('running group triggers');
+        console.log('running group triggers');  
     }]
 });
 
